@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="sk">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Otázky – Autoškola</title>
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <style>
+      body {
+        background: #f5f1e8;
+        font-family:
+          system-ui,
+          -apple-system,
+          sans-serif;
+        color: #3a2f25;
+      }
+
+      header {
+        padding: 20px 16px 12px;
+        text-align: center;
+        position: relative;
+      }
+
+      .okruh-title {
+        font-size: 1.7rem;
+        font-weight: 600;
+      }
+
+      .okruh-subtitle {
+        font-size: 0.95rem;
+        color: #6b5a4a;
+      }
+
+      .questions-wrapper {
+        max-width: 900px;
+        margin: 0 auto;
+        padding-bottom: 60px;
+      }
+
+      .question-card {
+        background: #e8dfcf;
+        border-radius: 18px;
+        padding: 20px 22px;
+        margin-bottom: 24px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+        position: relative;
+      }
+
+      .clear-question {
+        position: absolute;
+        top: 14px;
+        right: 16px;
+        cursor: pointer;
+        color: #9a8570;
+        font-size: 1rem;
+      }
+
+      .clear-question:hover {
+        color: #7a6550;
+      }
+
+      .question-number {
+        font-weight: 600;
+        margin-bottom: 6px;
+      }
+
+      .question-text {
+        margin-bottom: 14px;
+      }
+
+      .question-image {
+        display: block;
+        max-width: 100%;
+        margin: 0 auto 16px;
+        border-radius: 12px;
+      }
+
+      .answers {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .answer {
+        background: #f5f1e8;
+        border-radius: 10px;
+        padding: 10px 14px;
+        cursor: pointer;
+        transition: background 0.15s;
+      }
+
+      .answer:hover {
+        background: #efe6d6;
+      }
+
+      .answer.correct {
+        background: #cfe3c4;
+      }
+
+      .answer.wrong {
+        background: #e6c7c2;
+      }
+
+      .header-actions {
+        margin-top: 14px;
+        display: flex;
+        justify-content: center;
+        gap: 16px;
+      }
+
+      .header-btn.danger {
+        color: #8a4a3a;
+      }
+
+      .header-row {
+        margin-top: 10px;
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        align-items: center;
+      }
+
+      .header-btn {
+        background: #efe6d6;
+        border: none;
+        border-radius: 999px;
+        padding: 6px 14px;
+        font-size: 0.9rem;
+        color: #6b5a4a;
+        cursor: pointer;
+        transition: background 0.15s;
+        white-space: nowrap;
+      }
+
+      .header-btn:hover {
+        background: #e2d6c2;
+      }
+
+      .header-btn.danger {
+        color: #8a4a3a;
+      }
+
+      .okruh-subtitle {
+        text-align: center;
+        font-size: 0.95rem;
+        color: #6b5a4a;
+      }
+
+      .header-icons {
+        border-radius: 15px;
+        width: 80px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+      }
+
+      .icon-btn {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        border: none;
+        background: #efe6d6;
+        color: #6b5a4a;
+        font-size: 1rem;
+        cursor: pointer;
+        transition:
+          background 0.15s,
+          transform 0.1s;
+      }
+
+      .icon-btn:hover {
+        background: #e2d6c2;
+        transform: scale(1.05);
+      }
+
+      .icon-btn.danger {
+        color: #8a4a3a;
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <div
+        class="okruh-title"
+        id="okruhTitle"
+        style="margin-bottom: 10px"
+      ></div>
+
+      <div class="header-icons">
+        <button
+          class="icon-btn"
+          title="Späť na okruhy"
+          onclick="location.href = 'index.html'"
+        >
+          &#8617;
+        </button>
+
+        <button
+          class="icon-btn danger"
+          title="Vymazať odpovede"
+          id="clearAllBtn"
+        >
+          ❌
+        </button>
+      </div>
+
+      <div class="okruh-subtitle" id="okruhSubtitle"></div>
+    </header>
+
+    <main class="questions-wrapper" id="questionsContainer"></main>
+
+    <script src="tests.js"></script>
+    <script src="questions.js"></script>
+
+    <script>
+      const params = new URLSearchParams(location.search);
+      const okruhIndex = Number(params.get("okruh"));
+      const selectedOkruh = otazkyPodlaOkruhov[okruhIndex];
+
+      const storageKey = `autoskoly_answers_${okruhIndex}`;
+      let savedAnswers = JSON.parse(localStorage.getItem(storageKey) || "{}");
+
+      const container = document.getElementById("questionsContainer");
+      document.getElementById("okruhTitle").textContent = selectedOkruh.okruh;
+      document.getElementById("okruhSubtitle").textContent =
+        `${selectedOkruh.questions.length} otázok`;
+
+      function save() {
+        localStorage.setItem(storageKey, JSON.stringify(savedAnswers));
+      }
+
+      document.getElementById("clearAllBtn").onclick = () => {
+        savedAnswers = {};
+        save();
+        render();
+      };
+
+      function render() {
+        container.innerHTML = "";
+
+        selectedOkruh.questions.forEach((q, qi) => {
+          const card = document.createElement("div");
+          card.className = "question-card";
+
+          card.innerHTML = `
+            <div class="clear-question">✕</div>
+            <div class="question-number">Otázka ${qi + 1}</div>
+            <div class="question-text">${q.questionName}</div>
+          `;
+
+          card.querySelector(".clear-question").onclick = () => {
+            delete savedAnswers[qi];
+            save();
+            render();
+          };
+
+          if (q.imageUrl) {
+            const img = document.createElement("img");
+            img.src = `${q.imageUrl}`;
+            img.className = "question-image";
+            card.appendChild(img);
+          }
+
+          const answersDiv = document.createElement("div");
+          answersDiv.className = "answers";
+
+          q.answers.forEach((a, ai) => {
+            const ans = document.createElement("div");
+            ans.className = "answer";
+            ans.textContent = a.text;
+
+            const saved = savedAnswers[qi];
+            if (saved) {
+              if (ai === saved.selected) {
+                ans.classList.add(saved.correct ? "correct" : "wrong");
+              }
+            }
+
+            ans.onclick = () => {
+              const correct = a.isCorrect;
+              savedAnswers[qi] = { selected: ai, correct };
+              save();
+              render();
+            };
+
+            answersDiv.appendChild(ans);
+          });
+
+          card.appendChild(answersDiv);
+          container.appendChild(card);
+        });
+      }
+
+      render();
+    </script>
+  </body>
+</html>
