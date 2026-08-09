@@ -28,6 +28,28 @@
         font-size: 1.6rem;
       }
 
+      .start-test-wrapper {
+        display: flex;
+        justify-content: center;
+        margin: -12px 0 28px;
+      }
+
+      .start-test-btn {
+        border: 0;
+        border-radius: 999px;
+        padding: 12px 30px;
+        background: #3f6f4e;
+        color: #fff;
+        font-weight: 700;
+        box-shadow: 0 5px 14px rgba(63, 111, 78, 0.24);
+        transition: transform 0.15s ease, background 0.15s ease;
+      }
+
+      .start-test-btn:hover {
+        background: #315b3e;
+        transform: translateY(-2px);
+      }
+
       .okruh-card {
         background: #e8dfcf;
         border-radius: 16px;
@@ -60,6 +82,12 @@
 
   <body>
     <header>📘 Okruhy autoškoly</header>
+
+    <div class="start-test-wrapper">
+      <button type="button" class="start-test-btn" onclick="location.href = 'test.html'">
+        Start Test
+      </button>
+    </div>
 
     <main class="container pb-5">
       <div id="okruhy-grid" class="row g-4"></div>
