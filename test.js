@@ -93,7 +93,11 @@ function renderNavigation() {
     button.textContent = String(index + 1);
     button.setAttribute("aria-label", "Ot\u00e1zka " + (index + 1));
     button.classList.toggle("current", index === currentQuestion && !finished);
-    button.classList.toggle("answered", answers[index] !== null);
+    const selectedAnswer = answers[index];
+    const isCorrect = selectedAnswer !== null && question.answers[selectedAnswer].isCorrect;
+    button.classList.toggle("answered", !finished && selectedAnswer !== null);
+    button.classList.toggle("correct-final", finished && isCorrect);
+    button.classList.toggle("incorrect-final", finished && !isCorrect);
     button.addEventListener("click", () => {
       currentQuestion = index;
       renderQuestion();
@@ -195,6 +199,7 @@ function finishTest(dueToTimeout) {
   clearInterval(timerId);
   secondsLeft = Math.max(0, secondsLeft);
   updateHeader();
+  renderNavigation();
   renderResults(dueToTimeout);
 }
 
@@ -216,7 +221,7 @@ function renderResults(dueToTimeout) {
   });
 
   content.innerHTML = "";
-  nav.hidden = true;
+  nav.hidden = false;
   const card = document.createElement("section");
   card.className = "results-card";
   const status = document.createElement("h2");
